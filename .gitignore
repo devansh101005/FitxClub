@@ -1,0 +1,135 @@
+# =============================================================================
+# Fitness Club — project-wide .gitignore
+# =============================================================================
+
+# ---- Java / Maven (Spring Boot backend) -------------------------------------
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.mvn/wrapper/maven-wrapper.jar
+
+# ---- Node / npm / Vite (React frontend) -------------------------------------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+
+# ---- Logs -------------------------------------------------------------------
+logs/
+*.log
+app.log
+backend.log
+spring.log
+
+# ---- Environment / secrets --------------------------------------------------
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+*.pem
+*.key
+
+# ---- IDE / Editors ----------------------------------------------------------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# ---- OS ---------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ---- Docker / Postgres local volumes ----------------------------------------
+pgdata/
+postgres-data/
+*.dump
+*.sql.gz
+
+# ---- Claude Code local harness ----------------------------------------------
+.claude/
+.claude-cache/
+CLAUDE.local.md
+
+# ---- Ad-hoc / local scripts not part of the build ---------------------------
+fix_passwords.sql
+*.bak
+*.tmp
+*.orig
+
+# ---- Test / coverage --------------------------------------------------------
+coverage/
+.nyc_output/
+*.lcov
+surefire-reports/
+failsafe-reports/
+
+# =============================================================================
+# Academic / course deliverables at PROJECT ROOT only
+# (lab handouts, viva notes, reports, presentation drafts, screenshots, UML)
+# Leading "/" anchors to root so code/ subdirs are NOT affected.
+# =============================================================================
+
+# Loose documents at root (viva notes, demo scripts, project overviews)
+/*.md
+!/README.md
+
+# Academic PDFs, images, screenshots, HTML guides at root
+/*.pdf
+/*.jpg
+/*.jpeg
+/*.jpg.jpeg
+/*.png
+/*.gif
+/*.html
+
+# SRS / UML / design artifact folders
+/class diagram/
+/dfd/
+/sequence/
+/srs/
+/ucd/
+/testing/
+
+# Individual explicit root files (defensive — in case wildcards don't catch)
+/DEMO_GUIDE.md
+/DEMO_SCRIPT.md
+/FITNESS_CLUB_COMPLETE_PROJECT_DOCUMENT.md
+/PHASE1_VIVA_PREPARATION.md
+/PRESENTATION_SCRIPT.md
+/PROJECT_OVERVIEW.md
+/TESTING_VIVA_GUIDE.html
+/Lab Handout (Software Engineering).pdf
+/Problem Statement.pdf
+/Testing_Report_FitnessClub.pdf
+/JUnit.jpg.jpeg
+/selenium.jpeg
+/pm1.jpg.jpeg
+/pm2.jpg.jpeg
+/pm3.jpg.jpeg
