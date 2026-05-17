@@ -2,6 +2,7 @@ package com.fitnessclub.auth.controller;
 
 import com.fitnessclub.auth.dto.LoginRequest;
 import com.fitnessclub.auth.dto.RefreshTokenRequest;
+import com.fitnessclub.auth.dto.SignupRequest;
 import com.fitnessclub.auth.dto.TokenResponse;
 import com.fitnessclub.auth.service.AuthService;
 import com.fitnessclub.common.ApiResponse;
@@ -30,6 +31,14 @@ public class AuthController {
         TokenResponse tokens = authService.selfRegister(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(tokens, "Registration successful"));
+    }
+
+    @PostMapping("/signup")
+    @Operation(summary = "Public signup with sensible defaults (MONTHLY plan, ALL_FACILITIES access)")
+    public ResponseEntity<ApiResponse<TokenResponse>> signup(@Valid @RequestBody SignupRequest request) {
+        TokenResponse tokens = authService.signup(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(tokens, "Signup successful"));
     }
 
     @PostMapping("/login")

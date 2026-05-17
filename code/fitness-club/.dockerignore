@@ -1,0 +1,12 @@
+target/
+*.log
+*.bak
+*.tmp
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+.mvn/wrapper/maven-wrapper.jar
+fix_passwords.sql
+README.md

@@ -1,12 +1,15 @@
 package com.fitnessclub.auth.service;
 
 import com.fitnessclub.auth.dto.LoginRequest;
+import com.fitnessclub.auth.dto.SignupRequest;
 import com.fitnessclub.auth.dto.TokenResponse;
 import com.fitnessclub.auth.entity.UserAccount;
 import com.fitnessclub.auth.repository.UserAccountRepository;
 import com.fitnessclub.common.BusinessException;
 import com.fitnessclub.config.JwtTokenProvider;
 import com.fitnessclub.membership.dto.RegisterRequest;
+import com.fitnessclub.membership.entity.AccessLevel;
+import com.fitnessclub.membership.entity.MembershipType;
 import com.fitnessclub.membership.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +42,22 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException("Registration failed"));
 
         return generateTokens(user);
+    }
+
+    @Transactional
+    public TokenResponse signup(SignupRequest request) {
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setFirstName(request.getFirstName());
+        registerRequest.setLastName(request.getLastName());
+        registerRequest.setEmail(request.getEmail());
+        registerRequest.setPhone(request.getPhone());
+        registerRequest.setPassword(request.getPassword());
+        registerRequest.setMembershipType(
+                request.getMembershipType() != null ? request.getMembershipType() : MembershipType.MONTHLY);
+        registerRequest.setAccessLevel(
+                request.getAccessLevel() != null ? request.getAccessLevel() : AccessLevel.ALL_FACILITIES);
+
+        return selfRegister(registerRequest);
     }
 
     public TokenResponse login(LoginRequest request) {

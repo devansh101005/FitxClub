@@ -289,7 +289,7 @@ export default function Facilities() {
           <p className="text-[15px] text-white/50 font-light leading-[1.7] mb-10 max-w-md mx-auto">
             One membership. Every facility. Whenever you need it.
           </p>
-          <Button variant="primaryLight" to="/login" icon={HiArrowRight}>
+          <Button variant="primaryLight" to="/signup" icon={HiArrowRight}>
             Become a Member
           </Button>
         </div>

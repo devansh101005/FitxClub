@@ -62,6 +62,23 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signup = async (payload) => {
+    setLoading(true);
+    try {
+      const res = await authApi.signup(payload);
+      if (!res?.data) {
+        throw new Error('Signup response was empty');
+      }
+      const userData = buildUserData(res.data);
+      localStorage.setItem('token', userData.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      return userData;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -71,7 +88,7 @@ export function AuthProvider({ children }) {
   const hasRole = (...roles) => user && roles.includes(user.role);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, hasRole }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, loading, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

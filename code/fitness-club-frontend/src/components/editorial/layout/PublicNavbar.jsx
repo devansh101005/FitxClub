@@ -111,7 +111,7 @@ export default function PublicNavbar({ links = DEFAULT_LINKS, className = '' }) 
                 Login
               </Link>
               <Link
-                to="/login"
+                to="/signup"
                 className="bg-[#111] text-white text-[0.8rem] font-medium px-5 py-2 rounded-full hover:bg-[#333] transition-colors duration-200"
               >
                 Get Started
@@ -175,7 +175,7 @@ export default function PublicNavbar({ links = DEFAULT_LINKS, className = '' }) 
                   Login
                 </Link>
                 <Link
-                  to="/login"
+                  to="/signup"
                   onClick={() => setMobileOpen(false)}
                   className="block text-center py-2.5 bg-[#111] text-white text-[0.85rem] font-medium rounded-full"
                 >

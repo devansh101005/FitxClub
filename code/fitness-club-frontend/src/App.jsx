@@ -2,9 +2,11 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { PublicShell, DashboardShell } from './components/editorial';
+import DemoBanner from './components/DemoBanner';
 
 import LandingPage from './pages/public/LandingPage';
 import Login from './pages/public/Login';
+import Signup from './pages/public/Signup';
 import ClassSchedule from './pages/public/ClassSchedule';
 import Trainers from './pages/public/Trainers';
 import Facilities from './pages/public/Facilities';
@@ -45,9 +47,11 @@ import NotFound from './pages/NotFound';
 export default function App() {
   return (
     <AuthProvider>
+      <DemoBanner />
       <Routes>
-        {/* Standalone full-screen login (no shell) */}
+        {/* Standalone full-screen login & signup (no shell) */}
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
         {/* Public routes wrapped in the editorial PublicShell */}
         <Route element={<PublicShell />}>

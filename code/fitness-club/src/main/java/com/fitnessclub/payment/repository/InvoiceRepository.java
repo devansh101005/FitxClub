@@ -21,6 +21,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
 
     List<Invoice> findByStatus(InvoiceStatus status);
 
-    @Query("SELECT COALESCE(MAX(CAST(SUBSTRING(i.invoiceNumber, 5) AS int)), 0) FROM Invoice i")
+    @Query(value = "SELECT COALESCE(MAX(CAST(SUBSTRING(invoice_number FROM 5) AS INTEGER)), 0) FROM invoice WHERE invoice_number ~ '^INV-[0-9]+$'", nativeQuery = true)
     int findMaxInvoiceSequence();
 }

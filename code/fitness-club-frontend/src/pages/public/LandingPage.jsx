@@ -141,7 +141,7 @@ export default function LandingPage() {
                 <Link to="/login" className="text-[0.85rem] font-medium text-[#111] hover:text-[#757575] transition-colors duration-200">
                   Login
                 </Link>
-                <Link to="/login" className="bg-[#111] text-white text-[0.8rem] font-medium px-5 py-2 rounded-full hover:bg-[#333] transition-colors duration-200">
+                <Link to="/signup" className="bg-[#111] text-white text-[0.8rem] font-medium px-5 py-2 rounded-full hover:bg-[#333] transition-colors duration-200">
                   Get Started
                 </Link>
               </>
@@ -180,7 +180,7 @@ export default function LandingPage() {
               ) : (
                 <>
                   <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-center py-2.5 text-[0.85rem] font-medium text-[#111] hover:text-[#757575] transition-colors">Login</Link>
-                  <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-center py-2.5 bg-[#111] text-white text-[0.85rem] font-medium rounded-full">Get Started</Link>
+                  <Link to="/signup" onClick={() => setMobileOpen(false)} className="block text-center py-2.5 bg-[#111] text-white text-[0.85rem] font-medium rounded-full">Get Started</Link>
                 </>
               )}
             </div>
@@ -233,7 +233,7 @@ export default function LandingPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/login"
+              to="/signup"
               className="bg-white text-[#0A0A0A] text-[0.8rem] font-semibold tracking-[0.15em] uppercase px-10 py-4 transition-all duration-300 hover:bg-[#C9A96E] hover:text-white hover:-translate-y-0.5"
             >
               Start Your Journey
@@ -389,7 +389,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/login"
+              to="/signup"
               className="bg-white text-[#0A0A0A] text-[0.8rem] font-semibold tracking-[0.15em] uppercase px-10 py-4 transition-all duration-300 hover:bg-[#C9A96E] hover:text-white hover:-translate-y-0.5"
             >
               Get Started Today

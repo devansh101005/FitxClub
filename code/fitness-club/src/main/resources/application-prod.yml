@@ -1,0 +1,33 @@
+# Production profile — activate with SPRING_PROFILES_ACTIVE=prod
+# All secrets MUST come from env vars; no hardcoded defaults below.
+
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    # Allow clean() in demo mode so the /admin/reset-demo endpoint works.
+    # Override to true in real production (non-demo) deploys.
+    clean-disabled: ${FLYWAY_CLEAN_DISABLED:false}
+
+logging:
+  level:
+    root: INFO
+    com.fitnessclub: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+    org.springframework.web: WARN
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
+
+app:
+  demo-mode: ${APP_DEMO_MODE:true}

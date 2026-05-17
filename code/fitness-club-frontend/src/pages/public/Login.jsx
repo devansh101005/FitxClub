@@ -17,6 +17,14 @@ const ROLE_REDIRECT = {
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80';
 
+const DEMO_ACCOUNTS = [
+  { label: 'Member', email: 'temp@test.com', password: 'Admin@123' },
+  { label: 'Trainer', email: 'trainer@fitnessclub.com', password: 'Admin@123' },
+  { label: 'Reception', email: 'reception@fitnessclub.com', password: 'Admin@123' },
+  { label: 'Manager', email: 'manager@fitnessclub.com', password: 'Admin@123' },
+  { label: 'Admin', email: 'admin@fitnessclub.com', password: 'Admin@123' },
+];
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -35,6 +43,20 @@ export default function Login() {
       navigate(ROLE_REDIRECT[user.role] || '/');
     } catch (err) {
       setError(err.message || 'Invalid credentials');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async (account) => {
+    setLoading(true);
+    setError('');
+    try {
+      const user = await login(account.email, account.password);
+      toast.success(`Logged in as ${account.label}.`);
+      navigate(ROLE_REDIRECT[user.role] || '/');
+    } catch (err) {
+      setError(err.message || 'Demo login failed');
     } finally {
       setLoading(false);
     }
@@ -161,13 +183,33 @@ export default function Login() {
             <div className="flex-1 h-px bg-[#1A1A1A]/10" />
           </div>
 
-          <div className="text-center">
+          <div className="text-center mb-12">
             <p className="text-[14px] text-[#6B6B6B] font-light leading-[1.7] mb-4">
-              Don&apos;t have an account? Visit the front desk or contact our team to begin your membership.
+              Don&apos;t have an account? Sign up in under a minute.
             </p>
-            <Button variant="link" href="#" icon={HiArrowRight}>
-              Explore Membership
+            <Button variant="link" to="/signup" icon={HiArrowRight}>
+              Create an Account
             </Button>
+          </div>
+
+          <div className="border-t border-[#1A1A1A]/10 pt-10">
+            <Eyebrow tone="gold" className="mb-3">Try the Demo</Eyebrow>
+            <p className="text-[13px] text-[#6B6B6B] font-light leading-[1.6] mb-5">
+              Explore any role without signing up. One-click access to a pre-loaded account.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {DEMO_ACCOUNTS.map((account) => (
+                <button
+                  key={account.label}
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleDemoLogin(account)}
+                  className="text-[0.7rem] font-semibold tracking-[0.12em] uppercase border border-[#1A1A1A]/20 bg-white px-4 py-2.5 text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white hover:border-[#1A1A1A] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {account.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

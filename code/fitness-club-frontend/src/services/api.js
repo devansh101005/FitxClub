@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api';
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem('token');
@@ -40,6 +40,7 @@ const putParams = (url, params) => {
 
 export const authApi = {
   login: (body) => post('/auth/login', body),
+  signup: (body) => post('/auth/signup', body),
   refresh: (body) => post('/auth/refresh', body),
 };
 

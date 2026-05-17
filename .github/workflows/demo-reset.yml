@@ -1,0 +1,45 @@
+name: Daily Demo Reset
+
+# Runs every day at 03:00 IST (21:30 UTC the previous day).
+# Hits the backend's /api/admin/reset-demo endpoint to clean + reseed the DB.
+#
+# Required GitHub Actions secrets (Settings → Secrets and variables → Actions):
+#   BACKEND_URL          — e.g. https://fitness-club-backend.onrender.com
+#   ADMIN_EMAIL          — admin@fitnessclub.com (or your seeded admin)
+#   ADMIN_PASSWORD       — Admin@123 (or the seeded password)
+#   DEMO_RESET_TOKEN     — optional extra guard; matches APP_DEMO_RESET_TOKEN
+#                          env on the backend. Leave both blank to skip.
+
+on:
+  schedule:
+    - cron: '30 21 * * *'   # 21:30 UTC = 03:00 IST
+  workflow_dispatch:        # manual trigger from GitHub UI
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake backend (Render free tier sleeps after 15 min)
+        run: |
+          curl -s -o /dev/null --max-time 60 "${{ secrets.BACKEND_URL }}/api/facilities" || true
+          sleep 5
+
+      - name: Login as admin and capture JWT
+        id: login
+        run: |
+          TOKEN=$(curl -s -X POST "${{ secrets.BACKEND_URL }}/api/auth/login" \
+            -H "Content-Type: application/json" \
+            -d "{\"email\":\"${{ secrets.ADMIN_EMAIL }}\",\"password\":\"${{ secrets.ADMIN_PASSWORD }}\"}" \
+            | python -c "import sys,json;print(json.load(sys.stdin)['data']['accessToken'])")
+          if [ -z "$TOKEN" ]; then
+            echo "Failed to obtain admin JWT"; exit 1
+          fi
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Reset demo database
+        run: |
+          curl -sf -X POST "${{ secrets.BACKEND_URL }}/api/admin/reset-demo" \
+            -H "Authorization: Bearer ${{ steps.login.outputs.token }}" \
+            -H "X-Reset-Token: ${{ secrets.DEMO_RESET_TOKEN }}"
+          echo "Reset complete."

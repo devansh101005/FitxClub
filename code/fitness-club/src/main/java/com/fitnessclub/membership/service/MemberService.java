@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class MemberService {
@@ -32,7 +31,6 @@ public class MemberService {
     private final QrCodeService qrCodeService;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
-    private final AtomicLong memberCounter = new AtomicLong(1000);
 
     public MemberService(MemberRepository memberRepository,
                          UserAccountRepository userAccountRepository,
@@ -125,7 +123,9 @@ public class MemberService {
     }
 
     private String generateMemberId() {
-        return "FC-" + memberCounter.incrementAndGet();
+        Integer max = memberRepository.findMaxMemberIdNumber();
+        int next = (max == null ? 1000 : max) + 1;
+        return "FC-" + next;
     }
 
     private LocalDate calculateExpiryDate(LocalDate startDate, MembershipType type) {

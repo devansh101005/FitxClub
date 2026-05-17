@@ -24,6 +24,7 @@ import com.razorpay.RazorpayException;
 import com.razorpay.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,9 @@ public class PaymentService {
     private final InvoiceService invoiceService;
     private final SubscriptionService subscriptionService;
     private final ApplicationEventPublisher eventPublisher;
+
+    @Value("${app.demo-mode:false}")
+    private boolean demoMode;
 
     public PaymentService(PaymentRepository paymentRepository,
                           MemberRepository memberRepository,
@@ -120,21 +124,26 @@ public class PaymentService {
             default -> throw new BusinessException("Unsupported payment type");
         }
 
-        // Create Razorpay order
+        // Create Razorpay order (or synthesize one in demo mode)
         try {
-            JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", amount.multiply(new BigDecimal("100")).intValue()); // Razorpay uses paise
-            orderRequest.put("currency", "INR");
-            orderRequest.put("receipt", "rcpt_" + UUID.randomUUID().toString().substring(0, 8));
-
-            Order razorpayOrder = razorpayClient.orders.create(orderRequest);
+            String razorpayOrderId;
+            if (demoMode) {
+                razorpayOrderId = "order_DEMO_" + UUID.randomUUID().toString().replace("-", "").substring(0, 14);
+            } else {
+                JSONObject orderRequest = new JSONObject();
+                orderRequest.put("amount", amount.multiply(new BigDecimal("100")).intValue()); // Razorpay uses paise
+                orderRequest.put("currency", "INR");
+                orderRequest.put("receipt", "rcpt_" + UUID.randomUUID().toString().substring(0, 8));
+                Order razorpayOrder = razorpayClient.orders.create(orderRequest);
+                razorpayOrderId = razorpayOrder.get("id");
+            }
 
             // Save payment record
             Payment payment = new Payment();
             payment.setMemberId(member.getId());
             payment.setAmount(amount);
             payment.setPaymentType(request.getPaymentType());
-            payment.setRazorpayOrderId(razorpayOrder.get("id"));
+            payment.setRazorpayOrderId(razorpayOrderId);
             payment.setStatus(PaymentStatus.CREATED);
             payment.setDescription(description);
             payment = paymentRepository.save(payment);
@@ -149,7 +158,7 @@ public class PaymentService {
             // Build response for frontend
             OrderResponse response = new OrderResponse();
             response.setPaymentId(payment.getId());
-            response.setRazorpayOrderId(razorpayOrder.get("id"));
+            response.setRazorpayOrderId(razorpayOrderId);
             response.setAmount(amount);
             response.setCurrency("INR");
             response.setRazorpayKeyId(razorpayConfig.getKeyId());
@@ -175,31 +184,33 @@ public class PaymentService {
             throw new BusinessException("Payment does not belong to you", HttpStatus.FORBIDDEN);
         }
 
-        // Verify signature with Razorpay
-        try {
-            JSONObject attributes = new JSONObject();
-            attributes.put("razorpay_order_id", request.getRazorpayOrderId());
-            attributes.put("razorpay_payment_id", request.getRazorpayPaymentId());
-            attributes.put("razorpay_signature", request.getRazorpaySignature());
+        // Verify signature with Razorpay (skipped in demo mode)
+        if (!demoMode) {
+            try {
+                JSONObject attributes = new JSONObject();
+                attributes.put("razorpay_order_id", request.getRazorpayOrderId());
+                attributes.put("razorpay_payment_id", request.getRazorpayPaymentId());
+                attributes.put("razorpay_signature", request.getRazorpaySignature());
 
-            boolean isValid = Utils.verifyPaymentSignature(attributes, razorpayConfig.getKeyId());
+                boolean isValid = Utils.verifyPaymentSignature(attributes, razorpayConfig.getKeyId());
 
-            if (!isValid) {
+                if (!isValid) {
+                    payment.setStatus(PaymentStatus.FAILED);
+                    paymentRepository.save(payment);
+                    invoiceService.markInvoiceCancelled(payment.getId());
+
+                    eventPublisher.publishEvent(new NotificationEvent(
+                            this, member.getId(), NotificationType.PAYMENT_FAILED,
+                            Map.of("orderId", request.getRazorpayOrderId())
+                    ));
+
+                    throw new BusinessException("Payment verification failed");
+                }
+            } catch (RazorpayException e) {
                 payment.setStatus(PaymentStatus.FAILED);
                 paymentRepository.save(payment);
-                invoiceService.markInvoiceCancelled(payment.getId());
-
-                eventPublisher.publishEvent(new NotificationEvent(
-                        this, member.getId(), NotificationType.PAYMENT_FAILED,
-                        Map.of("orderId", request.getRazorpayOrderId())
-                ));
-
-                throw new BusinessException("Payment verification failed");
+                throw new BusinessException("Payment verification error: " + e.getMessage());
             }
-        } catch (RazorpayException e) {
-            payment.setStatus(PaymentStatus.FAILED);
-            paymentRepository.save(payment);
-            throw new BusinessException("Payment verification error: " + e.getMessage());
         }
 
         // Payment verified - update records
